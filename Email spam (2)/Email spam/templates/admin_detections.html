@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}System Detections - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <h1 style="font-size: 1.85rem;">System-Wide Email Detections</h1>
+                <span class="nav-badge-admin">Audit Log</span>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.92rem;">
+                Audit email classifications across all registered accounts.
+            </p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary btn-sm">
+            &larr; Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Filters Toolbar -->
+    <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+        <form method="GET" action="{{ url_for('admin.detections_page') }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+            <div>
+                <label class="form-label" style="font-size: 0.8rem;">Search (Subject, Body, User)</label>
+                <input type="text" name="search" class="form-control" placeholder="Search keywords..." value="{{ search }}" style="padding: 0.55rem 0.85rem; font-size: 0.88rem;">
+            </div>
+
+            <div>
+                <label class="form-label" style="font-size: 0.8rem;">Prediction</label>
+                <select name="prediction" class="form-control" style="padding: 0.55rem 0.85rem; font-size: 0.88rem;">
+                    <option value="">All Predictions</option>
+                    <option value="Spam" {{ 'selected' if prediction_filter == 'Spam' }}>Spam</option>
+                    <option value="Not Spam" {{ 'selected' if prediction_filter == 'Not Spam' }}>Not Spam</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="form-label" style="font-size: 0.8rem;">Risk Level</label>
+                <select name="risk_level" class="form-control" style="padding: 0.55rem 0.85rem; font-size: 0.88rem;">
+                    <option value="">All Risk Levels</option>
+                    <option value="Safe" {{ 'selected' if risk_filter == 'Safe' }}>Safe (&lt;35%)</option>
+                    <option value="Suspicious" {{ 'selected' if risk_filter == 'Suspicious' }}>Suspicious (35-70%)</option>
+                    <option value="High Risk" {{ 'selected' if risk_filter == 'High Risk' }}>High Risk (&ge;70%)</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn btn-primary btn-sm" style="flex: 1;">Filter</button>
+                {% if search or prediction_filter or risk_filter %}
+                    <a href="{{ url_for('admin.detections_page') }}" class="btn btn-secondary btn-sm">Reset</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Detections Table -->
+    <div class="card">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Subject</th>
+                        <th>Prediction</th>
+                        <th>Spam Prob</th>
+                        <th>Risk Level</th>
+                        <th>Feedback</th>
+                        <th>Timestamp</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in detections %}
+                        {% set isSpam = item.prediction == 'Spam' %}
+                        <tr>
+                            <td class="font-mono" style="font-size: 0.8rem; color: var(--text-muted);">#{{ item.id }}</td>
+                            <td>
+                                <div style="font-weight: 600; font-size: 0.88rem;">{{ item.user_name or 'Anonymous' }}</div>
+                                <div class="font-mono" style="font-size: 0.75rem; color: var(--text-muted);">{{ item.user_email or 'N/A' }}</div>
+                            </td>
+                            <td style="font-weight: 600; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                {{ item.subject or '[No Subject]' }}
+                            </td>
+                            <td>
+                                <span class="badge {{ 'badge-spam' if isSpam else 'badge-safe' }}">{{ item.prediction }}</span>
+                            </td>
+                            <td style="font-weight: 700; color: {{ 'var(--spam-red)' if isSpam else 'var(--safe-green)' }};">
+                                {{ (item.spam_probability * 100)|round(1) }}%
+                            </td>
+                            <td>
+                                <span class="badge {{ 'badge-risk-high' if item.risk_level == 'High Risk' else ('badge-risk-suspicious' if item.risk_level == 'Suspicious' else 'badge-risk-safe') }}">
+                                    {{ item.risk_level }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if item.feedback %}
+                                    <span style="font-size: 0.78rem; font-weight: 700; color: {{ 'var(--safe-green)' if item.feedback == 'Correct' else 'var(--spam-red)' }};">
+                                        ✓ {{ item.feedback }}
+                                    </span>
+                                {% else %}
+                                    <span style="color: var(--text-muted); font-size: 0.78rem;">None</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-size: 0.82rem; color: var(--text-muted);">
+                                {{ item.created_at.strftime('%b %d, %H:%M') }}
+                            </td>
+                            <td>
+                                <button class="btn btn-secondary btn-sm" onclick="viewHistoryDetails({{ item.id }})">
+                                    Details
+                                </button>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                                No detection records found matching criteria.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal (reused structure) -->
+<div id="details-modal" class="modal-backdrop">
+    <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h2 style="font-size: 1.25rem;">Detection Audit Log</h2>
+                <span id="modal-id" class="font-mono" style="color: var(--text-muted); font-size: 0.85rem;"></span>
+            </div>
+            <button type="button" class="alert-close" onclick="closeDetailsModal()" style="font-size: 1.5rem;">&times;</button>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 1.25rem; flex-wrap: wrap;">
+            <span id="modal-prediction" class="badge"></span>
+            <span id="modal-risk" class="badge"></span>
+            <span style="font-size: 0.82rem; color: var(--text-muted); margin-left: auto;" id="modal-date"></span>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-size: 0.8rem; color: var(--text-muted);">Email Subject</label>
+            <div id="modal-subject" style="font-weight: 700; color: var(--text-primary); font-size: 1.05rem;"></div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-size: 0.8rem; color: var(--text-muted);">Email Content Body</label>
+            <div id="modal-body" style="background: var(--bg-input); padding: 1rem; border-radius: var(--radius-md); font-size: 0.88rem; max-height: 180px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; color: var(--text-primary); border: 1px solid var(--border-color);"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; text-align: center;">
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); padding: 8px; border-radius: var(--radius-sm);">
+                <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted);">Spam Prob</span>
+                <div id="modal-spam-pct" style="font-size: 1.15rem; font-weight: 700; color: var(--spam-red);"></div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 8px; border-radius: var(--radius-sm);">
+                <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted);">Safe Prob</span>
+                <div id="modal-safe-pct" style="font-size: 1.15rem; font-weight: 700; color: var(--safe-green);"></div>
+            </div>
+            <div style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.25); padding: 8px; border-radius: var(--radius-sm);">
+                <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted);">URLs Found</span>
+                <div id="modal-url-count" style="font-size: 1.15rem; font-weight: 700; color: var(--cyan);"></div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-size: 0.8rem; color: var(--text-muted);">Supporting Indicators</label>
+            <div id="modal-reasons"></div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; text-align: right;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="closeDetailsModal()">Close</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+{% endblock %}

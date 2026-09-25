@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}SpamShield AI - Intelligent Email Spam & Phishing Detection{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="hero-ambient-wrapper">
+        <div class="hero-ambient-glow"></div>
+
+        <!-- Theme Change Button on Home Page -->
+        <div style="display: flex; justify-content: center; margin-bottom: 1.75rem; position: relative; z-index: 1;">
+            <button type="button" class="home-theme-toggle-btn" onclick="toggleTheme()" id="home-theme-btn"
+                title="Toggle Light / Dark Mode">
+                <span id="home-theme-icon">🌙</span>
+                <span id="home-theme-label">Switch to Dark Theme</span>
+            </button>
+        </div>
+
+        <h1
+            style="font-size: clamp(2.3rem, 5.2vw, 3.8rem); font-weight: 800; letter-spacing: -0.035em; line-height: 1.18; margin-bottom: 1.35rem; position: relative; z-index: 1;">
+            Stop Malicious Emails with <br>
+            <span
+                style="background: linear-gradient(135deg, #2563eb 0%, #0284c7 50%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Mathematical
+                Precision</span>
+        </h1>
+
+        <!-- Main Action Button -->
+        <div style="display: flex; justify-content: center; position: relative; z-index: 1; margin-top: 2rem;">
+            <a href="{{ url_for('predict.analyze') }}" class="btn btn-primary btn-lg"
+                style="padding: 0.95rem 2.6rem; font-size: 1.05rem; border-radius: var(--radius-full); box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35);">
+                Analyze Email Now &rarr;
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Features of SpamShield AI -->
+    <section id="features" class="reveal" style="margin-top: 5rem; margin-bottom: 3.5rem;">
+        <div style="text-align: center; max-width: 680px; margin: 0 auto 3rem;">
+            <span
+                style="display: inline-block; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary); background: rgba(37, 99, 235, 0.08); padding: 5px 14px; border-radius: 9999px; margin-bottom: 0.85rem; border: 1px solid rgba(37, 99, 235, 0.18);">
+                Core Capabilities
+            </span>
+            <h2
+                style="font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 800; letter-spacing: -0.025em; margin-bottom: 0.85rem;">
+                Key Features of SpamShield AI
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6;">
+                Engineered with high-speed machine learning, explainable heuristics, and comprehensive auditing to
+                protect inboxes against modern phishing threats.
+            </p>
+        </div>
+
+        <div class="features-grid">
+            <!-- Feature 1: TF-IDF & Logistic Regression -->
+            <div class="feature-box">
+                <div class="feature-icon-wrapper" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                    </svg>
+                </div>
+                <span class="feature-badge-tag" style="background: rgba(37, 99, 235, 0.08); color: #2563eb;">Machine
+                    Learning</span>
+                <h3 style="font-size: 1.18rem; font-weight: 700; margin-bottom: 0.5rem;">TF-IDF &amp; Logistic
+                    Regression</h3>
+                <p
+                    style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; flex-grow: 1;">
+                    Converts incoming email subjects and content into weighted n-gram token vectors, evaluating threat
+                    probabilities in under 10 milliseconds.
+                </p>
+                <div
+                    style="font-size: 0.78rem; font-weight: 600; color: #2563eb; display: flex; align-items: center; gap: 5px;">
+                    <span>⚡ Sub-10ms Inference Speed</span>
+                </div>
+            </div>
+
+            <!-- Feature 2: Calibrated Probability Scoring -->
+            <div class="feature-box">
+                <div class="feature-icon-wrapper" style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M16 12l-4-4-4 4" />
+                        <path d="M12 16V8" />
+                    </svg>
+                </div>
+                <span class="feature-badge-tag"
+                    style="background: rgba(14, 165, 233, 0.08); color: #0284c7;">Transparency</span>
+                <h3 style="font-size: 1.18rem; font-weight: 700; margin-bottom: 0.5rem;">Calibrated Probability Scoring
+                </h3>
+                <p
+                    style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; flex-grow: 1;">
+                    Avoids ambiguous black-box decisions by providing precise, calibrated percentage confidence for both
+                    Spam and Legitimate (Ham) verdicts.
+                </p>
+                <div
+                    style="font-size: 0.78rem; font-weight: 600; color: #0284c7; display: flex; align-items: center; gap: 5px;">
+                    <span>📊 0% – 100% Probability Metric</span>
+                </div>
+            </div>
+
+            <!-- Feature 3: Suspicious Signal & Keyword Extraction -->
+            <div class="feature-box">
+                <div class="feature-icon-wrapper" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                </div>
+                <span class="feature-badge-tag" style="background: rgba(239, 68, 68, 0.08); color: #dc2626;">Threat
+                    Intelligence</span>
+                <h3 style="font-size: 1.18rem; font-weight: 700; margin-bottom: 0.5rem;">Explainable Threat Signals</h3>
+                <p
+                    style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; flex-grow: 1;">
+                    Extracts and highlights high-risk triggers such as urgency manipulation, spoofed domains, numeric IP
+                    hyperlinks, and financial extortion keywords.
+                </p>
+                <div
+                    style="font-size: 0.78rem; font-weight: 600; color: #dc2626; display: flex; align-items: center; gap: 5px;">
+                    <span>🔍 Transparent Heuristic Signals</span>
+                </div>
+            </div>
+
+            <!-- Feature 4: Interactive Threat Diagnostic Scanner -->
+            <div class="feature-box">
+                <div class="feature-icon-wrapper" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="m9 12 2 2 4-4" />
+                    </svg>
+                </div>
+                <span class="feature-badge-tag"
+                    style="background: rgba(16, 185, 129, 0.08); color: #059669;">Diagnostics</span>
+                <h3 style="font-size: 1.18rem; font-weight: 700; margin-bottom: 0.5rem;">Interactive Email Scanner</h3>
+                <p
+                    style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; flex-grow: 1;">
+                    Analyze any email instantly or test pre-loaded templates ranging from urgent PayPal phishing to
+                    genuine corporate notifications with a single click.
+                </p>
+                <div
+                    style="font-size: 0.78rem; font-weight: 600; color: #059669; display: flex; align-items: center; gap: 5px;">
+                    <span>🛡️ One-Click Threat Preloads</span>
+                </div>
+            </div>
+
+            <!-- Feature 5: Persistent Scan History & Audit Logs -->
+            <div class="feature-box">
+                <div class="feature-icon-wrapper" style="background: rgba(124, 58, 237, 0.1); color: #7c3aed;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                </div>
+                <span class="feature-badge-tag" style="background: rgba(124, 58, 237, 0.08); color: #7c3aed;">Audit
+                    Trail</span>
+                <h3 style="font-size: 1.18rem; font-weight: 700; margin-bottom: 0.5rem;">Scan History &amp; Analytics
+                </h3>
+                <p
+                    style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; flex-grow: 1;">
+                    Review your full scan archive stored in PostgreSQL, with detailed threat breakdowns, timestamps,
+                    probability ratings, and search filtering.
+                </p>
+                <div
+                    style="font-size: 0.78rem; font-weight: 600; color: #7c3aed; display: flex; align-items: center; gap: 5px;">
+                    <span>🗄️ PostgreSQL Persisted Archive</span>
+                </div>
+            </div>
+
+            <!-- Feature 6: Role-Based Multi-User Security -->
+            <div class="feature-box">
+                <div class="feature-icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </div>
+                <span class="feature-badge-tag" style="background: rgba(245, 158, 11, 0.08); color: #d97706;">Security
+                    &amp; Admin</span>
+                <h3 style="font-size: 1.18rem; font-weight: 700; margin-bottom: 0.5rem;">Role-Based Access Control</h3>
+                <p
+                    style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; flex-grow: 1;">
+                    Granular User and Admin authentication. Administrators gain enterprise telemetry, user management,
+                    and unified detection tracking.
+                </p>
+                <div
+                    style="font-size: 0.78rem; font-weight: 600; color: #d97706; display: flex; align-items: center; gap: 5px;">
+                    <span>👥 Admin &amp; User Portals</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Banner -->
+    <div class="card reveal"
+        style="margin-top: 3rem; padding: 3.5rem 2rem; text-align: center; background: linear-gradient(135deg, #eff6ff 0%, #ffffff 50%, #f0fdf4 100%); border: 1px solid #bfdbfe; border-radius: var(--radius-lg);">
+        <h2 style="font-size: 2.3rem; font-weight: 800; margin-bottom: 0.85rem;">Ready to inspect your emails?</h2>
+        <p style="color: var(--text-secondary); font-size: 1.05rem; max-width: 580px; margin: 0 auto 1.85rem;">
+            Classify suspicious messages in milliseconds with our pre-warmed machine learning engine.
+        </p>
+        <div style="display: flex; justify-content: center;">
+            <a href="{{ url_for('predict.analyze') }}" class="btn btn-primary btn-lg"
+                style="padding: 0.9rem 2.5rem; font-size: 1.05rem; border-radius: var(--radius-full);">
+                Analyze Email Now &rarr;
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

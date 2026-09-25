@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Detection History - SpamShield AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 1.85rem;">Detection History</h1>
+            <p style="color: var(--text-secondary); font-size: 0.92rem;">
+                Browse and audit your past email classifications, risk scores, and feedback logs.
+            </p>
+        </div>
+        <a href="{{ url_for('predict.analyze') }}" class="btn btn-primary btn-sm">
+            Analyze New Email
+        </a>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="card" style="padding: 1.25rem; margin-bottom: 1.75rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: end;">
+            <div>
+                <label class="form-label" style="font-size: 0.8rem;">Search Content</label>
+                <input type="text" id="history-search" class="form-control" placeholder="Search subject or body..." style="padding: 0.55rem 0.85rem; font-size: 0.88rem;">
+            </div>
+
+            <div>
+                <label class="form-label" style="font-size: 0.8rem;">Prediction</label>
+                <select id="filter-prediction" class="form-control" style="padding: 0.55rem 0.85rem; font-size: 0.88rem;">
+                    <option value="">All Predictions</option>
+                    <option value="Spam">Spam</option>
+                    <option value="Not Spam">Not Spam</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="form-label" style="font-size: 0.8rem;">Risk Level</label>
+                <select id="filter-risk" class="form-control" style="padding: 0.55rem 0.85rem; font-size: 0.88rem;">
+                    <option value="">All Risk Levels</option>
+                    <option value="Safe">Safe (&lt;35%)</option>
+                    <option value="Suspicious">Suspicious (35-70%)</option>
+                    <option value="High Risk">High Risk (&ge;70%)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="form-label" style="font-size: 0.8rem;">From Date</label>
+                <input type="date" id="filter-date-from" class="form-control" style="padding: 0.55rem 0.85rem; font-size: 0.88rem;">
+            </div>
+
+            <div>
+                <label class="form-label" style="font-size: 0.8rem;">To Date</label>
+                <input type="date" id="filter-date-to" class="form-control" style="padding: 0.55rem 0.85rem; font-size: 0.88rem;">
+            </div>
+        </div>
+    </div>
+
+    <!-- History Table Card -->
+    <div class="card">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Subject</th>
+                        <th>Prediction</th>
+                        <th>Spam Prob</th>
+                        <th>Risk Level</th>
+                        <th>Timestamp</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="history-table-body">
+                    <!-- Populated dynamically by history.js -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="history-empty" style="display: none; text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 8px; opacity: 0.6;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <p>No detection records found matching your filters.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div id="details-modal" class="modal-backdrop">
+    <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h2 style="font-size: 1.25rem;">Detection Details</h2>
+                <span id="modal-id" class="font-mono" style="color: var(--text-muted); font-size: 0.85rem;"></span>
+            </div>
+            <button type="button" class="alert-close" onclick="closeDetailsModal()" style="font-size: 1.5rem;">&times;</button>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 1.25rem; flex-wrap: wrap;">
+            <span id="modal-prediction" class="badge"></span>
+            <span id="modal-risk" class="badge"></span>
+            <span style="font-size: 0.82rem; color: var(--text-muted); margin-left: auto;" id="modal-date"></span>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-size: 0.8rem; color: var(--text-muted);">Email Subject</label>
+            <div id="modal-subject" style="font-weight: 700; color: var(--text-primary); font-size: 1.05rem;"></div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-size: 0.8rem; color: var(--text-muted);">Email Content Body</label>
+            <div id="modal-body" style="background: var(--bg-input); padding: 1rem; border-radius: var(--radius-md); font-size: 0.88rem; max-height: 180px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; color: var(--text-primary); border: 1px solid var(--border-color);"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; text-align: center;">
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); padding: 8px; border-radius: var(--radius-sm);">
+                <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted);">Spam Prob</span>
+                <div id="modal-spam-pct" style="font-size: 1.15rem; font-weight: 700; color: var(--spam-red);"></div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 8px; border-radius: var(--radius-sm);">
+                <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted);">Safe Prob</span>
+                <div id="modal-safe-pct" style="font-size: 1.15rem; font-weight: 700; color: var(--safe-green);"></div>
+            </div>
+            <div style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.25); padding: 8px; border-radius: var(--radius-sm);">
+                <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted);">URLs Found</span>
+                <div id="modal-url-count" style="font-size: 1.15rem; font-weight: 700; color: var(--cyan);"></div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-size: 0.8rem; color: var(--text-muted);">Supporting Indicators</label>
+            <div id="modal-reasons"></div>
+        </div>
+
+        <!-- Feedback in modal -->
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <span id="modal-feedback-status" style="font-size: 0.85rem; color: var(--text-secondary);"></span>
+            <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="submitModalFeedback('Correct')">👍 Correct</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="submitModalFeedback('Incorrect')">👎 Incorrect</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+{% endblock %}

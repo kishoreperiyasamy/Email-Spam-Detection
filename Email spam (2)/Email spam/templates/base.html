@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SpamShield AI - Intelligent Email Spam Detection{% endblock %}</title>
+    <meta name="description"
+        content="State-of-the-art Email Spam Detection Platform powered by Machine Learning (TF-IDF + Logistic Regression) and PostgreSQL.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+
+    <!-- Theme State Initializer (Prevent Flickering) -->
+    <script>
+        (function () {
+            try {
+                const savedTheme = localStorage.getItem('spamshield_theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) { }
+        })();
+    </script>
+</head>
+
+<body>
+    <!-- Global Animated Cyber Security Background Canvas -->
+    <canvas id="cyber-bg-canvas" class="cyber-bg-canvas"></canvas>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('predict.dashboard') if current_user else url_for('predict.index') }}"
+                class="brand-logo">
+                <div class="brand-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                <span>SpamShield <span style="color: var(--cyan);">AI</span></span>
+            </a>
+
+            <ul class="nav-links">
+                {% if current_user %}
+                {% if current_user.role == 'ADMIN' %}
+                <li><a href="{{ url_for('admin.dashboard') }}" class="nav-link">Admin Dashboard</a></li>
+                <li><a href="{{ url_for('admin.users_page') }}" class="nav-link">Users</a></li>
+                <li><a href="{{ url_for('admin.detections_page') }}" class="nav-link">All Detections</a></li>
+                <li><span class="nav-badge-admin">Admin</span></li>
+                {% else %}
+                <li><a href="{{ url_for('predict.dashboard') }}" class="nav-link">Dashboard</a></li>
+                <li><a href="{{ url_for('predict.analyze') }}" class="nav-link">Analyze Email</a></li>
+                <li><a href="{{ url_for('history.history_page') }}" class="nav-link">History</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('auth.profile') }}" class="nav-link">Profile ({{ current_user.name.split()[0]
+                        }})</a></li>
+                <li><a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm">Logout</a></li>
+                {% else %}
+                <li><a href="{{ url_for('predict.index') }}#features" class="nav-link">Features</a></li>
+                <li><a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-sm">Sign In</a></li>
+                <li><a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Get Started</a></li>
+                {% endif %}
+                <li>
+                    <button type="button" class="nav-theme-toggle-btn" onclick="toggleTheme()" id="nav-theme-btn"
+                        title="Toggle Theme" aria-label="Toggle Theme">
+                        🌙
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container alerts-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            <span>{{ message }}</span>
+            <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% if not_found %}
+        <div class="card" style="text-align: center; margin: 4rem auto; max-width: 500px;">
+            <h1 style="font-size: 3rem; color: var(--warn-yellow);">404</h1>
+            <h2>Page Not Found</h2>
+            <p style="color: var(--text-secondary); margin: 1rem 0 1.5rem;">The requested page does not exist or has
+                been moved.</p>
+            <a href="{{ url_for('predict.dashboard') if current_user else url_for('predict.index') }}"
+                class="btn btn-primary">Return Home</a>
+        </div>
+        {% elif server_error %}
+        <div class="card" style="text-align: center; margin: 4rem auto; max-width: 500px;">
+            <h1 style="font-size: 3rem; color: var(--spam-red);">500</h1>
+            <h2>Internal Server Error</h2>
+            <p style="color: var(--text-secondary); margin: 1rem 0 1.5rem;">An unexpected error occurred. Please try
+                again later.</p>
+            <a href="{{ url_for('predict.dashboard') if current_user else url_for('predict.index') }}"
+                class="btn btn-primary">Return Home</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Main Content Body -->
+    <main class="page-enter-wrapper" style="flex: 1; padding: 1.5rem 0 3rem;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

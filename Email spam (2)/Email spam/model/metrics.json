@@ -1,0 +1,143 @@
+{
+    "model_name": "Logistic Regression + TF-IDF",
+    "accuracy": 1.0,
+    "precision_score": 1.0,
+    "recall_score": 1.0,
+    "f1_score": 1.0,
+    "train_samples": 480,
+    "test_samples": 120,
+    "confusion_matrix": [
+        [
+            60,
+            0
+        ],
+        [
+            0,
+            60
+        ]
+    ],
+    "top_spam_words": [
+        {
+            "word": "urltoken",
+            "weight": 1.5153
+        },
+        {
+            "word": "moneytoken",
+            "weight": 1.2499
+        },
+        {
+            "word": "claim",
+            "weight": 1.0224
+        },
+        {
+            "word": "free",
+            "weight": 0.8081
+        },
+        {
+            "word": "immediately",
+            "weight": 0.6846
+        },
+        {
+            "word": "group",
+            "weight": 0.6182
+        },
+        {
+            "word": "bank",
+            "weight": 0.6108
+        },
+        {
+            "word": "click",
+            "weight": 0.6083
+        },
+        {
+            "word": "password",
+            "weight": 0.6019
+        },
+        {
+            "word": "hours",
+            "weight": 0.5701
+        },
+        {
+            "word": "free moneytoken",
+            "weight": 0.5694
+        },
+        {
+            "word": "within hours",
+            "weight": 0.5666
+        },
+        {
+            "word": "past due",
+            "weight": 0.5567
+        },
+        {
+            "word": "past",
+            "weight": 0.5567
+        },
+        {
+            "word": "invoice",
+            "weight": 0.5567
+        }
+    ],
+    "top_ham_words": [
+        {
+            "word": "team",
+            "weight": -0.9804
+        },
+        {
+            "word": "will",
+            "weight": -0.9533
+        },
+        {
+            "word": "regarding",
+            "weight": -0.9217
+        },
+        {
+            "word": "new",
+            "weight": -0.839
+        },
+        {
+            "word": "hello",
+            "weight": -0.8296
+        },
+        {
+            "word": "lunch",
+            "weight": -0.8212
+        },
+        {
+            "word": "please",
+            "weight": -0.7599
+        },
+        {
+            "word": "order",
+            "weight": -0.7364
+        },
+        {
+            "word": "appointment",
+            "weight": -0.7312
+        },
+        {
+            "word": "standard",
+            "weight": -0.6866
+        },
+        {
+            "word": "can",
+            "weight": -0.6805
+        },
+        {
+            "word": "reminder",
+            "weight": -0.6771
+        },
+        {
+            "word": "review",
+            "weight": -0.6699
+        },
+        {
+            "word": "request",
+            "weight": -0.5923
+        },
+        {
+            "word": "pull request",
+            "weight": -0.5923
+        }
+    ]
+}

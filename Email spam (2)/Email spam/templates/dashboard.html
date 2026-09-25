@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}Security Dashboard - SpamShield AI{% endblock %}
+
+{% block content %}
+{% set health_score = [100 - (stats.spam_percentage|int), 0]|max if stats.total_analyzed > 0 else 100 %}
+
+<div class="dash-container">
+    <!-- Modern Cybersecurity Welcome Hero Banner -->
+    <div class="dash-welcome-hero">
+        <div>
+            <div class="dash-hero-title">
+                <span>Welcome back, {{ current_user.name.split()[0] }}</span>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.88rem; margin: 0; max-width: 600px; line-height: 1.5;">
+                Continuous machine learning telemetry, phishing heuristics, and inbox threat audits.
+            </p>
+        </div>
+    </div>
+
+    <!-- Modern Glassmorphic KPI Cards Grid -->
+    <div class="dash-kpi-grid">
+        <!-- Total Scans -->
+        <div class="dash-kpi-card">
+            <div class="dash-kpi-header">
+                <div class="dash-kpi-icon-box blue">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                </div>
+                <span class="dash-kpi-tag blue">All Time</span>
+            </div>
+            <div class="dash-kpi-value">{{ stats.total_analyzed }}</div>
+            <div class="dash-kpi-label">Total Analyzed Emails</div>
+            <div class="dash-kpi-bar">
+                <div class="dash-kpi-fill blue" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Spam Blocked -->
+        <div class="dash-kpi-card">
+            <div class="dash-kpi-header">
+                <div class="dash-kpi-icon-box red">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </div>
+                <span class="dash-kpi-tag red">Blocked</span>
+            </div>
+            <div class="dash-kpi-value" style="color: var(--spam-red);">{{ stats.spam_count }}</div>
+            <div class="dash-kpi-label">Spam &amp; Phishing Traps</div>
+            <div class="dash-kpi-bar">
+                <div class="dash-kpi-fill red" style="width: {{ stats.spam_percentage }}%;"></div>
+            </div>
+        </div>
+
+        <!-- Safe Emails -->
+        <div class="dash-kpi-card">
+            <div class="dash-kpi-header">
+                <div class="dash-kpi-icon-box green">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <path d="m9 12 2 2 4-4"></path>
+                    </svg>
+                </div>
+                <span class="dash-kpi-tag green">Verified</span>
+            </div>
+            <div class="dash-kpi-value" style="color: var(--safe-green);">{{ stats.safe_count }}</div>
+            <div class="dash-kpi-label">Legitimate Clean Inflow</div>
+            <div class="dash-kpi-bar">
+                <div class="dash-kpi-fill green" style="width: {{ health_score }}%;"></div>
+            </div>
+        </div>
+
+        <!-- Threat Exposure Rate -->
+        <div class="dash-kpi-card">
+            <div class="dash-kpi-header">
+                <div class="dash-kpi-icon-box cyan">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="5" x2="5" y2="19"></line>
+                        <circle cx="6.5" cy="6.5" r="2.5"></circle>
+                        <circle cx="17.5" cy="17.5" r="2.5"></circle>
+                    </svg>
+                </div>
+                <span class="dash-kpi-tag {{ 'green' if stats.spam_percentage < 25 else ('red' if stats.spam_percentage > 50 else 'cyan') }}">
+                    {{ 'Low Exposure' if stats.spam_percentage < 25 else ('High Exposure' if stats.spam_percentage > 50 else 'Moderate') }}
+                </span>
+            </div>
+            <div class="dash-kpi-value">{{ stats.spam_percentage }}%</div>
+            <div class="dash-kpi-label">Spam Exposure Ratio</div>
+            <div class="dash-kpi-bar">
+                <div class="dash-kpi-fill cyan" style="width: {{ stats.spam_percentage }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Threat Classification Doughnut & Vector Breakdown -->
+    <div class="dash-card" style="margin-bottom: 1.75rem;">
+        <div class="dash-card-header">
+            <div>
+                <h3>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2">
+                        <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                        <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                    </svg>
+                    Threat Exposure Breakdown
+                </h3>
+                <div class="dash-card-subtitle">Distribution across TF-IDF risk probability thresholds</div>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; background: #f8fafc; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 6px;">
+                ML Pipeline
+            </span>
+        </div>
+
+        <div class="dash-chart-row">
+            <div class="dash-chart-container">
+                <canvas id="userThreatChart" 
+                    data-safe="{{ stats.safe_count }}" 
+                    data-suspicious="{{ stats.suspicious_count }}" 
+                    data-high-risk="{{ stats.high_risk_count }}">
+                </canvas>
+            </div>
+
+            <div class="dash-risk-list">
+                <!-- Safe Level -->
+                <div class="dash-risk-row">
+                    <div class="dash-risk-header">
+                        <span class="dash-risk-title" style="color: var(--safe-green);">
+                            <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block;"></span>
+                            Safe Emails (&lt; 35%)
+                        </span>
+                        <span class="dash-risk-count" style="color: var(--safe-green);">
+                            {{ stats.safe_count }}
+                            <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 500;">
+                                ({{ ((stats.safe_count / stats.total_analyzed) * 100)|round(1) if stats.total_analyzed > 0 else 0 }}%)
+                            </span>
+                        </span>
+                    </div>
+                    <div class="dash-risk-bar">
+                        <div class="dash-risk-bar-fill" style="width: {{ ((stats.safe_count / stats.total_analyzed) * 100)|round(1) if stats.total_analyzed > 0 else 0 }}%; background: #10b981;"></div>
+                    </div>
+                </div>
+
+                <!-- Suspicious Level -->
+                <div class="dash-risk-row">
+                    <div class="dash-risk-header">
+                        <span class="dash-risk-title" style="color: var(--warn-yellow);">
+                            <span style="width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; display: inline-block;"></span>
+                            Suspicious (35% – 69%)
+                        </span>
+                        <span class="dash-risk-count" style="color: var(--warn-yellow);">
+                            {{ stats.suspicious_count }}
+                            <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 500;">
+                                ({{ ((stats.suspicious_count / stats.total_analyzed) * 100)|round(1) if stats.total_analyzed > 0 else 0 }}%)
+                            </span>
+                        </span>
+                    </div>
+                    <div class="dash-risk-bar">
+                        <div class="dash-risk-bar-fill" style="width: {{ ((stats.suspicious_count / stats.total_analyzed) * 100)|round(1) if stats.total_analyzed > 0 else 0 }}%; background: #f59e0b;"></div>
+                    </div>
+                </div>
+
+                <!-- High Risk -->
+                <div class="dash-risk-row">
+                    <div class="dash-risk-header">
+                        <span class="dash-risk-title" style="color: var(--spam-red);">
+                            <span style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block;"></span>
+                            High Risk (&ge; 70%)
+                        </span>
+                        <span class="dash-risk-count" style="color: var(--spam-red);">
+                            {{ stats.high_risk_count }}
+                            <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 500;">
+                                ({{ ((stats.high_risk_count / stats.total_analyzed) * 100)|round(1) if stats.total_analyzed > 0 else 0 }}%)
+                            </span>
+                        </span>
+                    </div>
+                    <div class="dash-risk-bar">
+                        <div class="dash-risk-bar-fill" style="width: {{ ((stats.high_risk_count / stats.total_analyzed) * 100)|round(1) if stats.total_analyzed > 0 else 0 }}%; background: #ef4444;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Activity Stream: Recent Detections -->
+    <div class="dash-table-card">
+        <div class="dash-table-header">
+            <div>
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 14 14"></polyline>
+                    </svg>
+                    Recent Analysis Activity
+                </h3>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                    Your latest scans and classification outputs
+                </div>
+            </div>
+            <a href="{{ url_for('history.history_page') }}" class="dash-btn-outline" style="padding: 0.45rem 0.95rem; font-size: 0.8rem;">
+                View Full Audit History &rarr;
+            </a>
+        </div>
+
+        {% if recent_detections %}
+            <div class="table-responsive">
+                <table class="dash-modern-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">ID</th>
+                            <th>Subject Line</th>
+                            <th style="width: 120px;">Classification</th>
+                            <th style="width: 110px;">Spam Prob</th>
+                            <th style="width: 120px;">Risk Level</th>
+                            <th style="width: 90px;">URLs</th>
+                            <th style="width: 120px;">Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in recent_detections %}
+                            <tr>
+                                <td class="font-mono" style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">
+                                    #{{ item.id }}
+                                </td>
+                                <td class="dash-subject-cell">
+                                    {{ item.subject or '[No Subject Provided]' }}
+                                </td>
+                                <td>
+                                    <span class="badge {{ 'badge-spam' if item.prediction == 'Spam' else 'badge-safe' }}" style="font-size: 0.75rem; padding: 3px 9px;">
+                                        {{ '🚨 Spam' if item.prediction == 'Spam' else '🛡️ Safe' }}
+                                    </span>
+                                </td>
+                                <td style="font-weight: 700; font-size: 0.86rem; color: {{ 'var(--spam-red)' if item.prediction == 'Spam' else 'var(--safe-green)' }};">
+                                    {{ (item.spam_probability * 100)|round(1) }}%
+                                </td>
+                                <td>
+                                    <span class="badge {{ 'badge-risk-high' if item.risk_level == 'High Risk' else ('badge-risk-suspicious' if item.risk_level == 'Suspicious' else 'badge-risk-safe') }}" style="font-size: 0.73rem; padding: 2px 8px;">
+                                        {{ item.risk_level }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="dash-url-chip">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                        </svg>
+                                        {{ item.url_count }}
+                                    </span>
+                                </td>
+                                <td style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;">
+                                    {{ item.created_at.strftime("%b %d, %H:%M") }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: #eff6ff; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.8">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                </div>
+                <div style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem; margin-bottom: 4px;">No emails analyzed yet</div>
+                <p style="font-size: 0.82rem; margin: 0 0 1rem;">Paste any suspicious message to audit threats with our ML engine.</p>
+                <a href="{{ url_for('predict.analyze') }}" class="dash-btn-primary" style="font-size: 0.82rem; padding: 0.5rem 1rem;">
+                    Analyze Your First Email &rarr;
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

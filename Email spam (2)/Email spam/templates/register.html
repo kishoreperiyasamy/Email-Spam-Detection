@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - SpamShield AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 480px; margin: 2rem auto;">
+    <div class="card">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div class="brand-icon" style="margin: 0 auto 1rem; width: 48px; height: 48px;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <polyline points="16 11 18 13 22 9"></polyline>
+                </svg>
+            </div>
+            <h2>Create an Account</h2>
+            <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px;">Register for intelligent email
+                classification</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.register') }}">
+            <div class="form-group">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" id="name" name="name" class="form-control" placeholder="Jane Doe"
+                    value="{{ name or '' }}" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="jane@example.com"
+                    value="{{ email or '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-control"
+                    placeholder="At least 6 characters" required minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                    placeholder="Repeat your password" required minlength="6">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.75rem; padding: 0.8rem;">
+                Create Account
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text-secondary);">
+            Already have an account? <a href="{{ url_for('auth.login') }}">Sign In</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

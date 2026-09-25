@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - SpamShield AI{% endblock %}
+
+{% block content %}
+<div class="login-hero-container">
+    <div class="login-glow-aura"></div>
+
+    <div style="margin-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
+        <a href="{{ url_for('predict.index') }}" class="login-home-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            <span>Back to Home</span>
+        </a>
+        <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-muted); background: #ffffff; border: 1px solid var(--border-color); padding: 2px 9px; border-radius: 9999px;">
+            🛡️ Secure Portal
+        </span>
+    </div>
+
+    <div class="login-glass-card">
+        <div style="text-align: center; margin-bottom: 1.15rem;">
+            <div class="login-brand-shield">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.3">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                </svg>
+            </div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 0.25rem;">
+                Sign In to SpamShield
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 0.82rem; max-width: 290px; margin: 0 auto; line-height: 1.45;">
+                Real-time machine learning threat intelligence &amp; inbox audits
+            </p>
+        </div>
+
+        <!-- Quick Evaluation Role Pills -->
+        <div class="role-eval-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">
+                    One-Click Evaluation
+                </span>
+                <span style="font-size: 0.7rem; color: var(--primary); font-weight: 600;">⚡ Instant Credentials</span>
+            </div>
+            <div class="role-pills-row">
+                <button type="button" id="pill-user" class="role-pill-btn" onclick="fillDemoUser()">
+                    <span>👤</span>
+                    <span>User</span>
+                </button>
+                <button type="button" id="pill-admin" class="role-pill-btn" onclick="fillAdminUser()">
+                    <span>🛡️</span>
+                    <span>Admin</span>
+                </button>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <div class="form-group" style="margin-bottom: 0.95rem;">
+                <label for="email" class="form-label" style="font-size: 0.82rem; font-weight: 600; margin-bottom: 0.35rem;">Email Address</label>
+                <div class="input-with-icon">
+                    <span class="input-icon-prefix">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    </span>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="name@company.com"
+                        value="{{ email or '' }}" required autofocus>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.05rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                    <label for="password" class="form-label" style="font-size: 0.82rem; font-weight: 600; margin-bottom: 0;">Password</label>
+                </div>
+                <div class="input-with-icon">
+                    <span class="input-icon-prefix">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </span>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+                    <button type="button" class="input-toggle-password" onclick="togglePasswordVisibility()" aria-label="Toggle Password Visibility" title="Show/Hide Password">
+                        <svg id="toggle-password-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="login-submit-btn">
+                <span>Sign In to Dashboard</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.15rem; padding-top: 0.85rem; border-top: 1px solid #f1f5f9; font-size: 0.82rem; color: var(--text-secondary);">
+            Don't have an account? <a href="{{ url_for('auth.register') }}" style="font-weight: 600; color: var(--primary); text-decoration: none;">Create an account &rarr;</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

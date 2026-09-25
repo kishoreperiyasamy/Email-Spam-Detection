@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile - SpamShield AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <!-- Header -->
+    <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 1.85rem;">Account Profile</h1>
+        <p style="color: var(--text-secondary); font-size: 0.92rem;">
+            Manage your account credentials, security settings, and personal details.
+        </p>
+    </div>
+
+    <!-- Account Details & Stats Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">User Details</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem;">
+                <div>
+                    <span style="color: var(--text-muted); display: block; font-size: 0.78rem; text-transform: uppercase;">Full Name</span>
+                    <strong style="color: var(--text-primary);">{{ user.name }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); display: block; font-size: 0.78rem; text-transform: uppercase;">Email Address</span>
+                    <strong style="color: var(--text-primary);">{{ user.email }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); display: block; font-size: 0.78rem; text-transform: uppercase;">Account Role</span>
+                    <span class="badge {{ 'badge-risk-suspicious' if user.role == 'ADMIN' else 'badge-safe' }}">{{ user.role }}</span>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); display: block; font-size: 0.78rem; text-transform: uppercase;">Member Since</span>
+                    <span>{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'Recent' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Lifetime Analysis Stats</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-secondary);">Total Analyzed</span>
+                    <strong style="font-size: 1.25rem; color: var(--text-primary);">{{ user_stats.total }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-secondary);">Spam Detected</span>
+                    <strong style="font-size: 1.25rem; color: var(--spam-red);">{{ user_stats.spam }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-secondary);">Safe Emails</span>
+                    <strong style="font-size: 1.25rem; color: var(--safe-green);">{{ user_stats.safe }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile & Password Card -->
+    <div class="card">
+        <h3 style="font-size: 1.15rem; margin-bottom: 1.25rem;">Update Profile & Security</h3>
+        <form method="POST" action="{{ url_for('auth.profile') }}">
+            <div class="form-group">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ user.name }}" required>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+            <h4 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--cyan);">Change Password (Optional)</h4>
+
+            <div class="form-group">
+                <label for="current_password" class="form-label">Current Password</label>
+                <input type="password" id="current_password" name="current_password" class="form-control" placeholder="Required only to change password">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="new_password" class="form-label">New Password</label>
+                    <input type="password" id="new_password" name="new_password" class="form-control" placeholder="At least 6 characters">
+                </div>
+                <div class="form-group">
+                    <label for="confirm_new_password" class="form-label">Confirm New Password</label>
+                    <input type="password" id="confirm_new_password" name="confirm_new_password" class="form-control" placeholder="Repeat new password">
+                </div>
+            </div>
+
+            <div style="text-align: right; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

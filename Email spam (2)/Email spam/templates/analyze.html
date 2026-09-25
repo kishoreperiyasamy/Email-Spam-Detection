@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}Analyze Email - SpamShield AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 920px; padding-top: 1.5rem;">
+    <!-- Centered Modern Hero Header -->
+    <div class="analyzer-hero">
+        <div class="analyzer-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>Multi-Modal AI Threat Scanner</span>
+        </div>
+        <h1 class="analyzer-title">Email Spam &amp; Phishing Analysis</h1>
+    </div>
+
+    <!-- Symmetrical Workspace Card -->
+    <div class="analyzer-workspace-card">
+        <!-- Quick Sample Presets Bar -->
+        <div class="presets-container">
+            <div class="presets-header">
+                <span class="presets-header-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    Quick Test Scenarios
+                </span>
+                <span class="presets-header-hint">Click any preset to auto-populate samples &amp; attachments</span>
+            </div>
+            <div class="presets-btn-grid">
+                <button type="button" class="preset-chip-btn" onclick="loadSample('photo_ad')">
+                    <span>📸</span> Photo Ad (Sale)
+                </button>
+                <button type="button" class="preset-chip-btn" onclick="loadSample('pdf_brochure')">
+                    <span>📄</span> PDF Brochure
+                </button>
+                <button type="button" class="preset-chip-btn" onclick="loadSample('phishing')">
+                    <span>🚨</span> PayPal Phishing
+                </button>
+                <button type="button" class="preset-chip-btn" onclick="loadSample('lottery')">
+                    <span>💰</span> Lottery Scam
+                </button>
+                <button type="button" class="preset-chip-btn" onclick="loadSample('crypto')">
+                    <span>🪙</span> Crypto Bot
+                </button>
+                <button type="button" class="preset-chip-btn" onclick="loadSample('work')">
+                    <span>💼</span> Work (Safe)
+                </button>
+                <button type="button" class="preset-chip-btn" onclick="loadSample('receipt')">
+                    <span>📦</span> Order Receipt (Safe)
+                </button>
+            </div>
+        </div>
+
+        <form id="analyze-form">
+            <!-- Email Subject Field -->
+            <div class="form-field-group">
+                <div class="form-field-label-row">
+                    <label for="subject" class="form-field-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <span>Email Subject</span>
+                    </label>
+                    <span class="form-field-hint">Used for urgent cues &amp; title vectorization</span>
+                </div>
+                <div class="modern-input-box">
+                    <div class="modern-input-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </div>
+                    <input type="text" id="subject" class="modern-text-input" placeholder="e.g. Action Required: Please verify your account information" autocomplete="off">
+                </div>
+            </div>
+
+            <!-- Email Body Content Field -->
+            <div class="form-field-group">
+                <div class="form-field-label-row">
+                    <label for="body" class="form-field-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <span>Email Body / Content</span>
+                    </label>
+                    <span id="text-counters" class="modern-counters">0 words &bull; 0 characters</span>
+                </div>
+                <textarea id="body" class="modern-textarea-input" rows="6" placeholder="Paste email content here, or upload a photo ad banner / PDF brochure below to auto-extract text..."></textarea>
+            </div>
+
+            <!-- Multi-Modal Attachment Dropzone (Hidden when file attached) -->
+            <div id="dropzone" class="attachment-upload-zone" onclick="document.getElementById('attachment-file').click()">
+                <input type="file" id="attachment-file" accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.eml" style="display: none;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="dropzone-circle-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary);">
+                            Attach Photo, Ad Banner, or PDF Brochure
+                        </div>
+                        <div style="font-size: 0.77rem; color: var(--text-muted);">
+                            Drag &amp; drop or click to upload &bull; Supports PNG, JPG, WEBP photos &amp; PDF brochures with auto OCR
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 0.42rem 0.95rem; pointer-events: none; border-radius: 8px;">
+                    📎 Browse File
+                </button>
+            </div>
+
+            <!-- Live Attachment Active Card (Displays in place of dropzone when file loaded) -->
+            <div id="file-preview-card" class="attachment-active-card">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img id="file-thumb" src="" alt="Thumbnail" style="display: none; width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1.5px solid #cbd5e1;">
+                    <div id="file-icon" style="width: 44px; height: 44px; border-radius: 8px; background: #ffffff; border: 1px solid #bfdbfe; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+                        📄
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span id="file-name" style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">document.pdf</span>
+                            <span id="file-type-badge" class="badge" style="font-size: 0.68rem; padding: 2px 7px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;">PDF</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                            <span id="file-size" style="font-size: 0.76rem; color: var(--text-muted);">0 KB</span>
+                            <span style="font-size: 0.74rem; color: var(--safe-green); font-weight: 600; display: flex; align-items: center; gap: 3px;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Attached &amp; Ready
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('attachment-file').click()" style="padding: 4px 10px; font-size: 0.76rem; border-radius: 6px;">
+                        Change File
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeAttachment()" style="padding: 4px 10px; font-size: 0.76rem; border-radius: 6px;">
+                        &times; Remove
+                    </button>
+                </div>
+
+                <!-- OCR / Extraction Progress Bar (Inside Active Card) -->
+                <div id="ocr-progress-box" style="display: none; width: 100%; margin-top: 10px; border-top: 1px solid #bfdbfe; padding-top: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: var(--primary); font-weight: 600; margin-bottom: 4px;">
+                        <span id="ocr-status-text">Scanning image text via OCR...</span>
+                        <span id="ocr-percent-text">0%</span>
+                    </div>
+                    <div style="height: 5px; background: #dbeafe; border-radius: 9999px; overflow: hidden;">
+                        <div id="ocr-bar-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #2563eb, #06b6d4); transition: width 0.2s ease;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Action Controls -->
+            <div class="analyzer-form-footer">
+                <button type="button" class="btn-clear-ghost" onclick="document.getElementById('subject').value=''; document.getElementById('body').value=''; removeAttachment(); document.getElementById('subject').dispatchEvent(new Event('input'));">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    Clear All
+                </button>
+                <button type="submit" id="analyze-btn" class="btn-analyze-submit">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    Analyze Email &amp; Media
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 3-Second Cyber Threat Scanner (Active During Analysis) -->
+    <div id="analyzing-card" class="card" style="display: none; border-color: #93c5fd; box-shadow: 0 14px 35px -8px rgba(37, 99, 235, 0.18); margin-bottom: 2rem; position: relative; overflow: hidden; background: #ffffff;">
+        <div class="scanner-sweep-beam"></div>
+
+        <div style="text-align: center; padding: 2.25rem 1rem;">
+            <!-- Radar Scanner Visual -->
+            <div class="cyber-radar-wrapper">
+                <div class="cyber-radar-sweep"></div>
+                <div class="cyber-radar-core">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <path d="m9 12 2 2 4-4"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <h3 style="font-size: 1.4rem; font-weight: 800; margin-top: 1.25rem; margin-bottom: 0.35rem; letter-spacing: -0.02em;">
+                SpamShield AI Analyzing Email...
+            </h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; max-width: 500px; margin: 0 auto 1.75rem; line-height: 1.5;">
+                Extracting textual n-grams, calculating TF-IDF vectors, and computing calibrated risk probabilities.
+            </p>
+
+            <!-- 4-Step Animated Pipeline Checklist -->
+            <div class="pipeline-steps-container">
+                <div id="scan-step-1" class="pipeline-step-item pending">
+                    <div class="step-indicator">1</div>
+                    <div style="flex-grow: 1;">
+                        <strong>Text Preprocessing:</strong> Regex tokenization &amp; cleaning
+                    </div>
+                    <span class="step-status-tag" style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">WAITING</span>
+                </div>
+
+                <div id="scan-step-2" class="pipeline-step-item pending">
+                    <div class="step-indicator">2</div>
+                    <div style="flex-grow: 1;">
+                        <strong>TF-IDF Vectorization:</strong> High-dimensional n-gram projection
+                    </div>
+                    <span class="step-status-tag" style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">WAITING</span>
+                </div>
+
+                <div id="scan-step-3" class="pipeline-step-item pending">
+                    <div class="step-indicator">3</div>
+                    <div style="flex-grow: 1;">
+                        <strong>Logistic Inference:</strong> Calibrated probability scoring
+                    </div>
+                    <span class="step-status-tag" style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">WAITING</span>
+                </div>
+
+                <div id="scan-step-4" class="pipeline-step-item pending">
+                    <div class="step-indicator">4</div>
+                    <div style="flex-grow: 1;">
+                        <strong>Heuristic Inspection:</strong> Threat signals &amp; URL sandboxing
+                    </div>
+                    <span class="step-status-tag" style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">WAITING</span>
+                </div>
+            </div>
+
+            <!-- 3-Second Animated Linear Progress Bar -->
+            <div style="max-width: 480px; margin: 1.75rem auto 0;">
+                <div class="scanning-progress-bar-bg">
+                    <div id="scan-progress-bar-fill" class="scanning-progress-bar-fill"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 8px;">
+                    <span id="scan-progress-label" style="font-weight: 600; color: var(--primary);">Analyzing email contents...</span>
+                    <span id="scan-progress-time" style="font-family: monospace; font-weight: 700;">3.0s remaining</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Results Section (Dynamic via AJAX) -->
+    <div id="result-card" class="card" style="display: none; border-color: var(--border-highlight); box-shadow: var(--shadow-glow);">
+        <div class="card-header">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <h2 style="font-size: 1.35rem;">Analysis Verdict</h2>
+                <span id="verdict-badge" class="badge"></span>
+            </div>
+            <span id="risk-badge" class="badge"></span>
+        </div>
+
+        <!-- Probabilities Bar & Gauges -->
+        <div style="margin-bottom: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.92rem; font-weight: 600; margin-bottom: 6px;">
+                <span style="color: var(--safe-green);">Safe Probability: <span id="safe-prob-pct">0%</span></span>
+                <span style="color: var(--spam-red);">Spam Probability: <span id="spam-prob-pct">0%</span></span>
+            </div>
+            <div class="prob-meter-wrapper">
+                <div id="prob-bar" class="prob-meter-bar" style="width: 0%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--text-muted);">
+                <span>0.0 (Legitimate)</span>
+                <span>Threshold: 0.50</span>
+                <span>1.0 (Definite Spam)</span>
+            </div>
+        </div>
+
+        <!-- Explainable Supporting Indicators -->
+        <div style="margin-bottom: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem;">
+                <h3 style="font-size: 1.05rem;">Explainable Supporting Indicators</h3>
+                <span style="font-size: 0.78rem; color: var(--text-muted); font-style: italic;">
+                    Supporting signals, not definitive proof
+                </span>
+            </div>
+            <div id="reasons-container"></div>
+        </div>
+
+        <!-- URL Inspection Breakdown -->
+        <div style="margin-bottom: 1.75rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--cyan);"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                <h4 style="font-size: 0.95rem; margin: 0;">Sandboxed URL Detection</h4>
+            </div>
+            <div id="url-analysis-container"></div>
+        </div>
+
+        <!-- Human Feedback Section -->
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <strong style="font-size: 0.9rem; color: var(--text-primary);">Was this prediction accurate?</strong>
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0;">
+                    Your feedback is stored in PostgreSQL for evaluation auditing without immediate model retraining.
+                </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="sendFeedback('Correct')">
+                    👍 Mark as Correct
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="sendFeedback('Incorrect')">
+                    👎 Mark as Incorrect
+                </button>
+                <div id="feedback-status" style="font-size: 0.85rem; margin-left: 8px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Tesseract.js for high-speed client-side OCR on Photos & Image Ads -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="{{ url_for('static', filename='js/analyze.js') }}"></script>
+{% endblock %}

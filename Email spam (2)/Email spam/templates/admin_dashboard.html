@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - SpamShield AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <h1 style="font-size: 1.85rem;">Admin Dashboard</h1>
+                <span class="nav-badge-admin">Admin</span>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.92rem; margin-top: 4px;">
+                System overview, detection statistics, threat distribution, and user activity.
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('admin.detections_page') }}" class="btn btn-primary btn-sm">
+                View All Detections &rarr;
+            </a>
+        </div>
+    </div>
+
+    <!-- Core Metrics Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon cyan">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
+            <div class="stat-info">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value">{{ stats.total_users }}</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+            </div>
+            <div class="stat-info">
+                <div class="stat-label">Total Emails</div>
+                <div class="stat-value">{{ stats.total_emails }}</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon red">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+            <div class="stat-info">
+                <div class="stat-label">Spam Blocked</div>
+                <div class="stat-value" style="color: var(--spam-red);">{{ stats.total_spam }}</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <div class="stat-info">
+                <div class="stat-label">Safe Emails</div>
+                <div class="stat-value" style="color: var(--safe-green);">{{ stats.total_safe }}</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon yellow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 14"></polyline>
+                </svg>
+            </div>
+            <div class="stat-info">
+                <div class="stat-label">Spam Rate</div>
+                <div class="stat-value">{{ stats.spam_percentage }}%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section (Chart.js) -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="card">
+            <div class="card-header">
+                <h3>Daily Detection Activity</h3>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Last 7 Days</span>
+            </div>
+            <div style="height: 280px; position: relative;">
+                <canvas id="chart-daily-trends"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Risk Level Distribution</h3>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Overall Threat Levels</span>
+            </div>
+            <div style="height: 280px; position: relative;">
+                <canvas id="chart-risk-dist"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Feedback Summary Card -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+            <h3>User Feedback & Accuracy</h3>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Community validation metrics</span>
+        </div>
+        <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; text-align: center;">
+            <div
+                style="background: #f8fafc; border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-md);">
+                <span
+                    style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Total
+                    Feedback</span>
+                <div style="font-size: 1.85rem; font-weight: 800; color: var(--text-primary); margin-top: 4px;">{{
+                    stats.feedback_total }}</div>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">Reviews submitted</p>
+            </div>
+
+            <div
+                style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 1.25rem; border-radius: var(--radius-md);">
+                <span
+                    style="font-size: 0.78rem; text-transform: uppercase; color: var(--safe-green); font-weight: 700;">Marked
+                    Correct</span>
+                <div style="font-size: 1.85rem; font-weight: 800; color: var(--safe-green); margin-top: 4px;">{{
+                    stats.feedback_correct }}</div>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">Agreed with prediction</p>
+            </div>
+
+            <div
+                style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1.25rem; border-radius: var(--radius-md);">
+                <span
+                    style="font-size: 0.78rem; text-transform: uppercase; color: var(--spam-red); font-weight: 700;">Marked
+                    Incorrect</span>
+                <div style="font-size: 1.85rem; font-weight: 800; color: var(--spam-red); margin-top: 4px;">{{
+                    stats.feedback_incorrect }}</div>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">Reported misclassification
+                </p>
+            </div>
+
+            <div
+                style="background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.2); padding: 1.25rem; border-radius: var(--radius-md);">
+                <span
+                    style="font-size: 0.78rem; text-transform: uppercase; color: var(--cyan); font-weight: 700;">Agreement
+                    Rate</span>
+                <div style="font-size: 1.85rem; font-weight: 800; color: var(--cyan); margin-top: 4px;">{{
+                    stats.feedback_accuracy }}%</div>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">User validation percentage
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
