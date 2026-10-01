@@ -6,12 +6,14 @@ load_dotenv()
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'spamshield_default_dev_secret_key_8829')
     
-    # Database Settings
+    # Database Settings (Local PostgreSQL or Supabase)
+    DATABASE_URL = os.getenv('DATABASE_URL', '')
     DB_HOST = os.getenv('DB_HOST', 'localhost')
     DB_PORT = int(os.getenv('DB_PORT', 5432))
     DB_NAME = os.getenv('DB_NAME', 'email_spam_db')
     DB_USER = os.getenv('DB_USER', 'postgres')
     DB_PASSWORD = os.getenv('DB_PASSWORD', 'password')
+    DB_SSLMODE = os.getenv('DB_SSLMODE', 'require' if 'supabase' in (os.getenv('DB_HOST', '') + os.getenv('DATABASE_URL', '')) else 'prefer')
 
     # Model Paths
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))

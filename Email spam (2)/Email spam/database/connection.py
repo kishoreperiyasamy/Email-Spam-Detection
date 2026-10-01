@@ -11,31 +11,59 @@ def init_connection_pool():
     global _connection_pool
     if _connection_pool is None:
         try:
-            _connection_pool = pool.ThreadedConnectionPool(
-                minconn=1,
-                maxconn=20,
-                host=Config.DB_HOST,
-                port=Config.DB_PORT,
-                dbname=Config.DB_NAME,
-                user=Config.DB_USER,
-                password=Config.DB_PASSWORD,
-                connect_timeout=5
-            )
-            print(f"[DB] PostgreSQL Connection Pool established for {Config.DB_NAME}")
+            if Config.DATABASE_URL:
+                _connection_pool = pool.ThreadedConnectionPool(
+                    minconn=1,
+                    maxconn=20,
+                    dsn=Config.DATABASE_URL,
+                    connect_timeout=15
+                )
+                print("[DB] PostgreSQL Connection Pool established via DATABASE_URL (Supabase/Remote)")
+            else:
+                _connection_pool = pool.ThreadedConnectionPool(
+                    minconn=1,
+                    maxconn=20,
+                    host=Config.DB_HOST,
+                    port=Config.DB_PORT,
+                    dbname=Config.DB_NAME,
+                    user=Config.DB_USER,
+                    password=Config.DB_PASSWORD,
+                    sslmode=Config.DB_SSLMODE,
+                    connect_timeout=15
+                )
+                print(f"[DB] PostgreSQL Connection Pool established for {Config.DB_NAME} at {Config.DB_HOST}:{Config.DB_PORT}")
         except Exception as e:
             print(f"[DB Error] Failed to initialize connection pool: {e}")
+            _connection_pool = None
             raise e
 
 def get_connection():
     global _connection_pool
     if _connection_pool is None:
         init_connection_pool()
-    return _connection_pool.getconn()
+    try:
+        conn = _connection_pool.getconn()
+        if conn and getattr(conn, 'closed', 0) != 0:
+            try:
+                _connection_pool.putconn(conn, close=True)
+            except Exception:
+                pass
+            conn = _connection_pool.getconn()
+        return conn
+    except Exception as e:
+        # If pool became unhealthy, reset it and retry once
+        print(f"[DB Pool Warning] Connection failed ({e}), refreshing pool...")
+        _connection_pool = None
+        init_connection_pool()
+        return _connection_pool.getconn()
 
 def release_connection(conn):
     global _connection_pool
     if _connection_pool and conn:
-        _connection_pool.putconn(conn)
+        try:
+            _connection_pool.putconn(conn)
+        except Exception:
+            pass
 
 @contextmanager
 def get_db_connection():

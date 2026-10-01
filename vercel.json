@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "Email spam (2)/Email spam/app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "Email spam (2)/Email spam/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "Email spam (2)/Email spam/app.py"
+    }
+  ]
+}

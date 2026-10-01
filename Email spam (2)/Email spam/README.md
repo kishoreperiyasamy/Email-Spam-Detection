@@ -82,13 +82,26 @@ email-spam-detector/
 - PostgreSQL 14+ (PostgreSQL 18 is running locally)
 
 ### 2. Environment Configuration (`.env`)
-Configure your database credentials in `.env`:
+Configure your database credentials in `.env`. You can use **Supabase** or **local PostgreSQL**:
+
+**Option A: Supabase (Recommended for Cloud)**
 ```ini
+# Copy the URI from Supabase: Project Settings -> Database -> Connection string -> URI
+DATABASE_URL=postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?sslmode=require
+SECRET_KEY=spamshield_ultra_secure_secret_key_2026_jwt_session_prod
+FLASK_ENV=development
+PORT=5000
+```
+
+**Option B: Local PostgreSQL**
+```ini
+DATABASE_URL=
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=email_spam_db
 DB_USER=postgres
 DB_PASSWORD=password
+DB_SSLMODE=prefer
 SECRET_KEY=spamshield_ultra_secure_secret_key_2026_jwt_session_prod
 FLASK_ENV=development
 PORT=5000
