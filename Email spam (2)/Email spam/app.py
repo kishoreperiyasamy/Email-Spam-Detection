@@ -1,12 +1,13 @@
 import os
 from flask import Flask, render_template, session
 from config import Config
-from database.connection import init_db, get_db_cursor
+from database.connection import init_db
 from services.prediction_service import prediction_service
 from routes.auth_routes import auth_bp
 from routes.prediction_routes import predict_bp
 from routes.history_routes import history_bp
 from routes.admin_routes import admin_bp
+
 
 def create_app():
     app = Flask(__name__)
@@ -56,13 +57,14 @@ def create_app():
 
     return app
 
+
 app = create_app()
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     debug = os.getenv('FLASK_ENV', 'development') == 'development'
-    print(f"==================================================")
-    print(f"  SpamShield AI - Email Spam Detection Engine     ")
+    print("==================================================")
+    print("  SpamShield AI - Email Spam Detection Engine     ")
     print(f"  Server running on http://127.0.0.1:{port}        ")
-    print(f"==================================================")
+    print("==================================================")
     app.run(host='0.0.0.0', port=port, debug=debug)
